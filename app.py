@@ -2,17 +2,24 @@ import pandas as pd
 from dash import Dash, html, dcc
 import plotly.express as px
 
-# load data
-df = pd.read_csv("data/daily_sales_data_0.csv")
+df = pd.read_csv("cleaned_data.csv")
+df["date"] = pd.to_datetime(df["date"])
+df = df.sort_values("date")
 
-# simple graph
-fig = px.line(df, x=df.columns[0], y=df.columns[1], title="Sales Trend")
+df_grouped = df.groupby("date", as_index=False)["sales"].sum()
 
-# app
+fig = px.line(
+    df_grouped,
+    x="date",
+    y="sales",
+    title="Pink Morsel Sales Over Time",
+    labels={"date": "Date", "sales": "Sales"}
+)
+
 app = Dash(__name__)
 
 app.layout = html.Div([
-    html.H1("Sales Dashboard"),
+    html.H1("Pink Morsel Sales Visualiser"),
     dcc.Graph(figure=fig)
 ])
 
